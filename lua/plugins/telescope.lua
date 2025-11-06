@@ -18,7 +18,17 @@ return {
     },
   },
   config = function()
-    require('telescope').setup({})
+    require('telescope').setup({
+  defaults = {
+    file_ignore_patterns = { "node_modules", ".git" },
+    path_display = { "smart" },
+  },
+  pickers = {
+    live_grep = {
+      cwd = vim.fn.expand('%:p:h'),
+    },
+  },
+})
     require('telescope').load_extension('fzf')
     -- zotero gets loaded inside its own config
   end,

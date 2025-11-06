@@ -13,7 +13,14 @@ return {
 
   -- Lazy loading Snippets (optional)
   { "rafamadriz/friendly-snippets" },
-
+  {
+        "github/copilot.vim",
+        lazy = false,
+        config = function()
+            vim.g.copilot_no_tab_map = true;
+            vim.g.copilot_assume_mapped = true;
+        end
+  },
   -- Doom One (inkl. Miramar Vibes)
   {
     "GustavoPrietoP/doom-themes.nvim",
@@ -27,21 +34,34 @@ return {
     end,
   },
 -- LaTeX Support
-  {
-    "lervag/vimtex",
-    lazy = false,
-    init = function()
-      vim.g.vimtex_view_method = "zathura"
-      vim.g.vimtex_compiler_method = "latexmk"
-    end,
-  },
+{
+  "lervag/vimtex",
+  lazy = false,
+  init = function()
+    -- PDF Viewer
+    vim.g.vimtex_view_method = "zathura"
 
+    -- Compiler
+    vim.g.vimtex_compiler_method = "latexmk"
+
+    -- Latexmk-Optionen erweitern (wichtig für PlantUML)
+    vim.g.vimtex_compiler_latexmk = {
+      options = {
+        "-shell-escape",          -- erlaubt externe Tools (z. B. PlantUML)
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-synctex=1",
+      },
+    }
+  end,
+},
 -- Telescope
     {
         'nvim-telescope/telescope.nvim',
         dependencies = { 'nvim-lua/plenary.nvim' },
         version = '0.1.4',
     },
+
 -- Treesitter für Syntaxhighlighting
 {
   "nvim-treesitter/nvim-treesitter",
@@ -54,5 +74,29 @@ return {
     })
   end,
 },
+{
+  "github/copilot.vim",
+  lazy = false,
+  config = function()
+    vim.g.copilot_no_tab_map = true
+    vim.g.copilot_assume_mapped = true
 
+    vim.keymap.set("i", "<C-j>", 'copilot#Accept("<CR>")', {
+      expr = true,
+      silent = true,
+      noremap = true,
+      replace_keycodes = false,
+    })
+  end,
+{
+  "nvim-tree/nvim-tree.lua",
+  version = "*",
+  dependencies = {
+    "nvim-tree/nvim-web-devicons", -- optional, for file icons
+  },
+  config = function()
+    require("nvim-tree").setup {}
+  end,
+}
+}
 }
