@@ -21,6 +21,24 @@ return {
             vim.g.copilot_assume_mapped = true;
         end
   },
+  {
+    "andweeb/presence.nvim",
+    lazy = false,  -- load immediately (so it works when you start nvim)
+    config = function()
+        require("presence").setup({
+            auto_update         = true,
+            neovim_image_text   = "Neovim in WSL 🧠",
+            main_image          = "file",
+            log_level           = nil,
+            debounce_timeout    = 10,
+            enable_line_number  = true,
+            blacklist           = {},
+            buttons             = true,
+            show_time           = true,
+        })
+    end,
+},
+  
   -- Doom One (inkl. Miramar Vibes)
   {
     "GustavoPrietoP/doom-themes.nvim",
