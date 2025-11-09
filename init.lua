@@ -14,6 +14,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Plugins laden
 require("lazy").setup("plugins")
+require("config.lsp")
 
 -- Basis-Settings
 vim.opt.number = true
