@@ -1,4 +1,4 @@
--- Leader setzen
+-- Leader key
 vim.g.mapleader = " "
 vim.g.vimtex_complete_enabled = 1
 
@@ -12,38 +12,29 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Plugins laden
+-- Plugins
 require("lazy").setup("plugins")
 require("config.lsp")
 
--- Basis-Settings
+-- === Base Settings ===
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 
--- ==== clangd + Autocompletion Setup (Neue API) ====
+-- === LSP: clangd (modern API) ===
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
--- 1. LSP konfigurieren
-vim.lsp.config("clangd", {
-  cmd = { "clangd" },
-  capabilities = capabilities,
-})
-
--- 2. Server aktivieren
+vim.lsp.config("clangd", { cmd = { "clangd" }, capabilities = capabilities })
 vim.lsp.enable("clangd")
 
--- ==== nvim-cmp ====
+-- === nvim-cmp ===
 local cmp = require("cmp")
 local luasnip = require("luasnip")
 
 cmp.setup({
   snippet = {
-    expand = function(args)
-      luasnip.lsp_expand(args.body)
-    end,
+    expand = function(args) luasnip.lsp_expand(args.body) end,
   },
   mapping = cmp.mapping.preset.insert({
     ['<C-Space>'] = cmp.mapping.complete(),
@@ -57,7 +48,7 @@ cmp.setup({
   },
 })
 
--- cmp-vimtex nur in .tex aktivieren
+-- === cmp-vimtex (only in .tex files) ===
 cmp.setup.filetype("tex", {
   sources = cmp.config.sources({
     { name = "vimtex" },
@@ -65,9 +56,7 @@ cmp.setup.filetype("tex", {
   }),
 })
 
--- ==== Navigation / UI ====
-vim.keymap.set('n', '<leader><Tab>', ':Ex<CR>', { silent = true, desc = "Open netrw (file explorer)" })
-
+-- === Colors ===
 vim.api.nvim_create_autocmd("User", {
   pattern = "VeryLazy",
   callback = function()
@@ -76,29 +65,56 @@ vim.api.nvim_create_autocmd("User", {
   end,
 })
 
--- Netrw: Terminal öffnen mit "t"
-vim.api.nvim_create_autocmd("filetype", {
-  pattern = "netrw",
-  callback = function()
-    vim.keymap.set("n", "t", function()
-      vim.cmd("split | terminal")
-      vim.cmd("startinsert")
-    end, { buffer = true, desc = "Open terminal below and start typing" })
-  end
-})
+-- === Terminal ===
+-- Open terminal below current window
+vim.keymap.set("n", "<leader>tt", function()
+  vim.cmd("belowright split | terminal")
+  vim.cmd("resize 15")     -- optional: fixed height
+  vim.cmd("startinsert")
+end, { desc = "Open terminal below" })
 
--- Terminal mode escape
+-- Or open vertical terminal
+vim.keymap.set("n", "<leader>tv", function()
+  vim.cmd("vsplit | terminal")
+  vim.cmd("startinsert")
+end, { desc = "Open terminal on right" })
+
+-- Exit terminal mode quickly
 vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
 
--- Window navigation
+-- === Window Navigation ===
 vim.keymap.set("n", "<C-h>", "<C-w>h")
 vim.keymap.set("n", "<C-j>", "<C-w>j")
 vim.keymap.set("n", "<C-k>", "<C-w>k")
 vim.keymap.set("n", "<C-l>", "<C-w>l")
 
--- Telescope
+-- === Telescope (project-aware search) ===
 local telescope = require('telescope.builtin')
-vim.keymap.set('n', '<leader>pg', telescope.live_grep, { desc = "Telescope: Grep in project" })
-vim.keymap.set('n', '<leader>pb', telescope.current_buffer_fuzzy_find, { desc = "Telescope: Search in current file" })
-vim.keymap.set('n', '<leader>pf', telescope.find_files, { desc = "Telescope: Find Files" })
+
+-- Grep inside the Git project (not entire FS)
+vim.keymap.set("n", "<leader>pg", function()
+  local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+  if git_root and #git_root > 0 then
+    telescope.live_grep({ cwd = git_root })
+  else
+    telescope.live_grep()
+  end
+end, { desc = "Telescope: Grep in project" })
+
+-- Find files in project root
+vim.keymap.set("n", "<leader>pf", function()
+  local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+  if git_root and #git_root > 0 then
+    telescope.find_files({ cwd = git_root })
+  else
+    telescope.find_files()
+  end
+end, { desc = "Telescope: Find files in project" })
+
+-- Fuzzy find only current buffer
+vim.keymap.set("n", "<leader>pb", telescope.current_buffer_fuzzy_find, { desc = "Telescope: Search current buffer" })
+
+-- === nvim-tree integration ===
+vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { noremap = true, silent = true, desc = "Toggle file explorer" })
+vim.keymap.set("n", "<leader>r", ":NvimTreeFocus<CR>",  { noremap = true, silent = true, desc = "Focus file explorer" })
 
