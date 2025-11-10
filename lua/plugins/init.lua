@@ -29,16 +29,13 @@ return {
     end,
   },
 
-  -- Doom One Theme
+  -- Theme: Tokyonight
   {
-    "GustavoPrietoP/doom-themes.nvim",
+    "folke/tokyonight.nvim",
     lazy = false,
     priority = 1000,
     config = function()
-      vim.g.doom_one_terminal_colors = true
-      vim.g.doom_one_italic_comments = true
-      vim.g.doom_one_enable_treesitter = true
-      vim.g.doom_one_transparent_background = true
+      vim.cmd("colorscheme tokyonight-night")
     end,
   },
 
