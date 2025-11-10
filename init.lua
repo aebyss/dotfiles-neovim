@@ -65,23 +65,58 @@ vim.api.nvim_create_autocmd("User", {
   end,
 })
 
--- === Terminal ===
--- Open terminal below current window
-vim.keymap.set("n", "<leader>tt", function()
+-- === Terminal: Toggle und Close ===
+local function term_windows()
+  local wins = {}
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.bo[buf].buftype == "terminal" then
+      table.insert(wins, win)
+    end
+  end
+  return wins
+end
+
+local function open_term_bottom()
   vim.cmd("belowright split | terminal")
-  vim.cmd("resize 15")     -- optional: fixed height
+  vim.cmd("resize 15")
   vim.cmd("startinsert")
-end, { desc = "Open terminal below" })
+end
 
--- Or open vertical terminal
-vim.keymap.set("n", "<leader>tv", function()
-  vim.cmd("vsplit | terminal")
-  vim.cmd("startinsert")
-end, { desc = "Open terminal on right" })
+local function toggle_term()
+  local wins = term_windows()
+  if #wins > 0 then
+    -- Wenn nur Terminals offen sind, sorge für ein leeres Fenster
+    if #wins == #vim.api.nvim_list_wins() then
+      vim.cmd("enew")
+    end
+    for _, win in ipairs(wins) do
+      vim.api.nvim_win_close(win, true) -- schließt nur das Fenster, Job läuft weiter
+      -- Falls du den Terminal-Job beenden willst:
+      -- local buf = vim.api.nvim_win_get_buf(win)
+      -- vim.api.nvim_buf_delete(buf, { force = true })
+    end
+  else
+    open_term_bottom()
+  end
+end
 
--- Exit terminal mode quickly
-vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
+local function close_terminals()
+  local wins = term_windows()
+  if #wins == 0 then return end
+  if #wins == #vim.api.nvim_list_wins() then
+    vim.cmd("enew")
+  end
+  for _, win in ipairs(wins) do
+    vim.api.nvim_win_close(win, true)
+  end
+end
 
+vim.keymap.set("n", "<leader>tt", toggle_term, { desc = "Terminal toggeln" })
+vim.keymap.set("n", "<leader>q",  close_terminals, { desc = "Alle Terminals schließen" })
+
+-- Terminal: Escape zurück in Normal-Mode
+vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { desc = "Terminal verlassen" })
 -- === Window Navigation ===
 vim.keymap.set("n", "<C-h>", "<C-w>h")
 vim.keymap.set("n", "<C-j>", "<C-w>j")

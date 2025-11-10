@@ -29,25 +29,6 @@ return {
     end,
   },
 
-  -- Discord Presence
-  {
-    "andweeb/presence.nvim",
-    lazy = false,
-    config = function()
-      require("presence").setup({
-        auto_update = true,
-        neovim_image_text = "Neovim in WSL 🧠",
-        main_image = "file",
-        log_level = nil,
-        debounce_timeout = 10,
-        enable_line_number = true,
-        blacklist = {},
-        buttons = true,
-        show_time = true,
-      })
-    end,
-  },
-
   -- Doom One Theme
   {
     "GustavoPrietoP/doom-themes.nvim",
