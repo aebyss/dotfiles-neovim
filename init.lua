@@ -56,15 +56,6 @@ cmp.setup.filetype("tex", {
   }),
 })
 
--- === Colors ===
-vim.api.nvim_create_autocmd("User", {
-  pattern = "VeryLazy",
-  callback = function()
-    vim.cmd("colorscheme darkblue")
-    vim.cmd("highlight Normal guibg=NONE ctermbg=NONE")
-  end,
-})
-
 -- === Terminal: Toggle und Close ===
 local function term_windows()
   local wins = {}
