@@ -137,6 +137,7 @@ vim.keymap.set("n", "<leader>pf", function()
   end
 end, { desc = "Telescope: Find files in project" })
 
+
 -- Fuzzy find only current buffer
 vim.keymap.set("n", "<leader>pb", telescope.current_buffer_fuzzy_find, { desc = "Telescope: Search current buffer" })
 
